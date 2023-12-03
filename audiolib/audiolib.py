@@ -91,13 +91,15 @@ def get_ir_from_rfft(freq, cplx_data_spec, fs, nfft):
     return t, centered_ir
 
 def get_ir_from_rawdata(t, x, y, fs, nfft):
+    print('To be implemented.')
     return
 
 def plot_rfft_ir(t, ir, ):
-
+    print('To be implemented.')
     pass
 
 def get_msc(sig_0, sig_1, fs, blocklen, ):
+    print('Not tested, use with caution!')
     freq_msc, msc = scsp.coherence(
         sig_0,
         sig_1,
