@@ -5,7 +5,6 @@ import scipy.signal as scsp
 from matplotlib import ticker
 from scipy.fftpack import fftshift
 
-# TODO: Extend MKFUNC to higher values and values < 0
 MKFUNC = (
     lambda x, pos: '%1.1fM' % (x * 1e-6)
     if x >= 1e6 else '%1.1fk'
