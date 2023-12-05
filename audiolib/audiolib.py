@@ -22,7 +22,8 @@ def plot_time(t, data, fig=None, ax=None, **line_kwargs):
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
-    ax.legend()
+    if 'label' in line_kwargs:
+        ax.legend()
     plt.show(block=False)
     return fig, ax,
 
@@ -49,11 +50,9 @@ def plot_rfft_freq(
         ax.xaxis.set_major_formatter(mkformatter)
     if xscale == 'lin' and yscale == 'log':
         ax.semilogy(f, data, **line_kwargs)
-        ax.yaxis.set_major_formatter(mkformatter)
     if xscale == 'log' and yscale == 'log':
         ax.loglog(f, data, **line_kwargs)
         ax.xaxis.set_major_formatter(mkformatter)
-        ax.yaxis.set_major_formatter(mkformatter)
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
