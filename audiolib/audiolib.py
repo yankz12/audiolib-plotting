@@ -61,6 +61,13 @@ def plot_rfft_freq(
     plt.show(block=False)
     return fig, ax,
 
+def get_rfft_power_spec(x, fs, Nfft=None):
+    if Nfft is None:
+        Nfft = len(x)
+    freq = np.arange(Nfft/2+1)/(Nfft/2+1)*fs/2
+    Sxx = np.abs(np.fft.rfft(x, Nfft) / Nfft)**2
+    return freq, Sxx
+
 def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
     plt.figure()
     plt.subplot(311)
