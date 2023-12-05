@@ -11,6 +11,11 @@ MKFUNC = (
     if x >= 1e6 else '%1.1fk'
     % (x * 1e-3) if x >= 1e3 else '%1.1f'
     % x
+    % (x * 1e3) if x >= 1e-3 else '%1.1fm'
+    % (x * 1e6) if x >= 1e-6 else '%1.1fµ'
+    % (x * 1e9) if x >= 1e-9 else '%1.1fn'
+    % (x * 1e12) if x >= 1e-12 else '%1.1fp'
+    % x
 ) # Function to plot x- and y-axis with k for kilo and M for Mega
 
 def plot_time(t, data, fig=None, ax=None, **line_kwargs):
@@ -51,9 +56,11 @@ def plot_rfft_freq(
         ax.xaxis.set_major_formatter(mkformatter)
     if xscale == 'lin' and yscale == 'log':
         ax.semilogy(f, data, **line_kwargs)
+        ax.yaxis.set_major_formatter(mkformatter)
     if xscale == 'log' and yscale == 'log':
         ax.loglog(f, data, **line_kwargs)
         ax.xaxis.set_major_formatter(mkformatter)
+        ax.yaxis.set_major_formatter(mkformatter)
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
