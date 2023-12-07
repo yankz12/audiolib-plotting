@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np 
 import scipy.signal as scsp
+import scipy.io.wavfile as scio
 
 from matplotlib import ticker
 from scipy.fftpack import fftshift
@@ -17,8 +18,9 @@ MKFUNC = (
     % x
 ) # Function to plot x- and y-axis with k for kilo and M for Mega
 
-def plot_time(t, data, fig=None, ax=None, **line_kwargs):
-    plt.ion()
+def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
+    if interactive_on:
+        plt.ion()
     if fig is None:
         fig = plt.figure()
     if ax is None:
@@ -29,7 +31,7 @@ def plot_time(t, data, fig=None, ax=None, **line_kwargs):
     ax.grid(True, which='both')
     if 'label' in line_kwargs:
         ax.legend()
-    plt.show(block=False)
+    # plt.show(block=False)
     return fig, ax,
 
 def plot_rfft_freq(
@@ -39,10 +41,12 @@ def plot_rfft_freq(
         yscale='lin',
         fig=None,
         ax=None,
+        interactive_on=False,
         **line_kwargs,
 ):
     mkformatter = ticker.FuncFormatter(MKFUNC)
-    plt.ion()
+    if interactive_on:
+        plt.ion()
     if fig is None:
         fig = plt.figure()
     if ax is None:
@@ -64,7 +68,7 @@ def plot_rfft_freq(
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
     ax.legend()
-    plt.show(block=False)
+    # plt.show(block=False)
     return fig, ax,
 
 def get_rfft_power_spec(x, fs, Nfft=None):
@@ -138,3 +142,32 @@ def uint_to_float(arr_uint, bit_depth):
 def sint_to_float(arr_sint, bit_depth):
     num_bits = 2**(bit_depth-1)
     return arr_sint/num_bits
+
+def import_wav(fnames, ):
+    files = {}
+    float_sig = {}
+    for fname in fnames:
+        wav = scio.read(fname)
+        dt = str(wav[1].dtype)
+        if dt.startswith('int'):
+            to_float = sint_to_float
+        elif dt.startswith('uint'):
+            to_float = uint_to_float
+        bit_depth = int(str(wav[1].dtype)[-2:])
+        files[fname] = wav
+        fs = wav[0]
+        if np.size(wav[1][0]) == 2:
+            is_stereo = True
+        else:
+            is_stereo = False
+        if is_stereo:
+            left = np.array([stereo[0] for stereo in files[fname][1]])/((2**15)-1)
+            left = to_float(left, bit_depth)
+            right = np.array([stereo[1] for stereo in files[fname][1]])/((2**15)-1)
+            right = to_float(right, bit_depth)
+            float_sig[fname] = [fs, left, right,]
+        else:
+            left = np.array([stereo for stereo in files[fname][1]])/((2**15)-1)
+            float_sig[fname] = [fs, left,]
+        files[fname] = float_sig[fname]
+    return files
