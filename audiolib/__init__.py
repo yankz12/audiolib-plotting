@@ -9,7 +9,7 @@ from .audiolib import (
     get_msc,
     uint_to_float,
     sint_to_float,  
-    import_wav,  
+    wav_to_dict,  
     write_wav,  
 )
 
@@ -24,6 +24,6 @@ __all__ = [
     'get_msc',
     'uint_to_float',
     'sint_to_float',
-    'import_wav',
+    'wav_to_dict',
     'write_wav',
 ]
