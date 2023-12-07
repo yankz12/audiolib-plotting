@@ -156,10 +156,7 @@ def import_wav(fnames, ):
         bit_depth = int(str(wav[1].dtype)[-2:])
         files[fname] = wav
         fs = wav[0]
-        if np.size(wav[1][0]) == 2:
-            is_stereo = True
-        else:
-            is_stereo = False
+        is_stereo = True if np.size(wav[1][0]) == 2 else False
         if is_stereo:
             left = np.array([stereo[0] for stereo in files[fname][1]])/((2**15)-1)
             left = to_float(left, bit_depth)
@@ -171,3 +168,18 @@ def import_wav(fnames, ):
             float_sig[fname] = [fs, left,]
         files[fname] = float_sig[fname]
     return files
+
+def write_wav(fname, fs, is_stereo, data, ):
+    # TODO: Make data type flexible
+    if is_stereo:
+        out = np.transpose(
+                np.array(
+                [
+                    data[0].astype(np.int16),
+                    data[1].astype(np.int16),
+                ]
+            )
+        )
+    else:
+        out = np.array([data.astype(np.int16)])
+    scio.write(fname, fs, out.astype(np.int16))
