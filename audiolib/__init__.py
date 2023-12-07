@@ -10,6 +10,7 @@ from .audiolib import (
     uint_to_float,
     sint_to_float,  
     import_wav,  
+    write_wav,  
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     'uint_to_float',
     'sint_to_float',
     'import_wav',
+    'write_wav',
 ]
