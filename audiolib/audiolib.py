@@ -168,9 +168,7 @@ def wav_to_dict(fnames, ):
         fs = wav[0]
         is_stereo = True if np.size(wav[1][0]) == 2 else False
         if is_stereo:
-            left = np.array(files[fname][1][:, 0])/((2**15)-1)
             left = to_float(left, bit_depth)
-            right = np.array(files[fname][1][:, 1])/((2**15)-1)
             right = to_float(right, bit_depth)
             float_sig[fname] = [fs, left, right,]
         else:
