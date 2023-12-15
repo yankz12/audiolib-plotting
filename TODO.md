@@ -4,6 +4,7 @@ Overview of the TODOS for audiolib.
 
 ### General Todo
 
+- [ ] Write README.md
 - [ ] Try to write plotting functionalities as pyplot wrappers
 - [ ] Split functionalities in different modules
   (audiolib.plotting, audiolib.signal_processing, audiolib.utils, etc.)
@@ -23,8 +24,6 @@ audiolib.py:
 
 ### In Progress
 
-- [ ] Work on Github Repo [JIRA-345]  
-
 ### Done ✓
 
-- [x] Create my first TODO.md  
+- [x] Create TODO.md  
