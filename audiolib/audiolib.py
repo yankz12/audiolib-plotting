@@ -6,6 +6,10 @@ import scipy.io.wavfile as scio
 from matplotlib import ticker
 from scipy.fftpack import fftshift
 
+# TODO: Try to write plotting as pyplot wrapper
+
+# Function to plot x- and y-axis with k for kilo and M for Mega
+# TODO: Fix MKFUNC for yscale around 0
 MKFUNC = (
     lambda x, pos: '%1.1fM' % (x * 1e-6)
     if x >= 1e6 else '%1.1fk'
@@ -16,7 +20,7 @@ MKFUNC = (
     % (x * 1e9) if x >= 1e-9 else '%1.1fn'
     % (x * 1e12) if x >= 1e-12 else '%1.1fp'
     % x
-) # Function to plot x- and y-axis with k for kilo and M for Mega
+) 
 
 def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
     if interactive_on:
@@ -31,7 +35,6 @@ def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
     ax.grid(True, which='both')
     if 'label' in line_kwargs:
         ax.legend()
-    # plt.show(block=False)
     return fig, ax,
 
 def plot_rfft_freq(
@@ -39,6 +42,7 @@ def plot_rfft_freq(
         data,
         xscale='lin',
         yscale='lin',
+        scient_scale=True,
         fig=None,
         ax=None,
         interactive_on=False,
@@ -56,19 +60,17 @@ def plot_rfft_freq(
         ax.plot(f, data, **line_kwargs)
     if xscale == 'log' and yscale == 'lin':
         ax.semilogx(f, data, **line_kwargs)
-        ax.xaxis.set_major_formatter(mkformatter)
     if xscale == 'lin' and yscale == 'log':
         ax.semilogy(f, data, **line_kwargs)
-        ax.yaxis.set_major_formatter(mkformatter)
     if xscale == 'log' and yscale == 'log':
         ax.loglog(f, data, **line_kwargs)
+    if scient_scale and (xscale == 'log'):
         ax.xaxis.set_major_formatter(mkformatter)
-        ax.yaxis.set_major_formatter(mkformatter)
+        # TODO: Insert yaxis scient scale as soon as fixed
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
     ax.legend()
-    # plt.show(block=False)
     return fig, ax,
 
 def get_rfft_power_spec(x, fs, Nfft=None):
@@ -108,14 +110,17 @@ def get_ir_from_rfft(freq, cplx_data_spec, fs, nfft):
     return t, centered_ir
 
 def get_ir_from_rawdata(t, x, y, fs, nfft):
+    # TODO: Implement
     print('To be implemented.')
     return
 
 def plot_rfft_ir(t, ir, ):
+    # TODO: Implement
     print('To be implemented.')
     pass
 
 def get_msc(sig_0, sig_1, fs, blocklen, ):
+    # TODO: Test
     print('Not tested, use with caution!')
     freq_msc, msc = scsp.coherence(
         sig_0,
@@ -179,17 +184,6 @@ def wav_to_dict(fnames, ):
 
 def write_wav(fname, fs, data_dtype, wav_dtype, data,):
     # TODO: Make data type flexible
-    # if is_stereo:
-    #     out = np.transpose(
-    #             np.array(
-    #             [
-    #                 data[0].astype(np.int16),
-    #                 data[1].astype(np.int16),
-    #             ]
-    #         )
-    #     )
-    # else:
-    #     out = np.array([data.astype(np.int16)])
     if data_dtype.startswith('float') and wav_dtype.startswith('int'):
         bit_depth = int(wav_dtype[-2:])
         data = np.array(float_to_sint(data, bit_depth))
