@@ -7,6 +7,33 @@ from matplotlib.ticker import EngFormatter
 from scipy.fftpack import fftshift
 
 # TODO: Try to write plotting as pyplot wrapper
+ENG_FORMAT = EngFormatter()
+
+def _parse_plot_func(
+        ax,
+        xscale,
+        yscale,
+):
+    if xscale == 'lin' and yscale == 'lin':
+        plot_func = ax.plot
+    if xscale == 'log' and yscale == 'lin':
+        plot_func = ax.semilogx
+    if xscale == 'lin' and yscale == 'log':
+        plot_func = ax.semilogy
+    if xscale == 'log' and yscale == 'log':
+        plot_func = ax.loglog
+    return plot_func
+
+def _scale_plot(
+        ax,
+        scient_scale_x,
+        scient_scale_y,
+):
+    if scient_scale_x:
+        ax.xaxis.set_major_formatter(ENG_FORMAT)
+    if scient_scale_y:
+        ax.yaxis.set_major_formatter(ENG_FORMAT)
+    return ax
 
 def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
     if interactive_on:
@@ -35,32 +62,25 @@ def plot_rfft_freq(
         interactive_on=False,
         **line_kwargs,
 ):
-    
+
     if interactive_on:
         plt.ion()
     if fig is None:
         fig = plt.figure()
     if ax is None:
         ax = plt.gca()
-    x_formatter = EngFormatter(unit='Hz')
-    if xscale == 'lin' and yscale == 'lin':
-        ax.plot(f, data, **line_kwargs)
-    if xscale == 'log' and yscale == 'lin':
-        ax.semilogx(f, data, **line_kwargs)
-    if xscale == 'lin' and yscale == 'log':
-        ax.semilogy(f, data, **line_kwargs)
-    if xscale == 'log' and yscale == 'log':
-        ax.loglog(f, data, **line_kwargs)
-    if scient_scale_x:
-        x_formatter = EngFormatter()
-        ax.xaxis.set_major_formatter(x_formatter)
-    if scient_scale_y:
-        y_formatter = EngFormatter()
-        ax.yaxis.set_major_formatter(y_formatter)
+    plot_func = _parse_plot_func(
+        ax,
+        xscale,
+        yscale,
+    )
+    plot_func(f, data, **line_kwargs)
+    ax = _scale_plot(ax, scient_scale_x, scient_scale_y, )
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
-    ax.legend()
+    if 'label' in line_kwargs:
+        ax.legend()
     return fig, ax,
 
 def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
@@ -85,7 +105,7 @@ def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
     ax_msc.set_ylim([.5, 1.2])
     _ = plt.setp(ax_mod.get_xticklabels(), visible=False)
     _ = plt.setp(ax_arg.get_xticklabels(), visible=False)
-    
+
     return fig, ax_mod, ax_arg, ax_msc,
 
 def plot_mag_phase():
@@ -152,12 +172,11 @@ def plot_ir(
             'Chosen plot end smaller larger than highest available timestamp. ' +
             'Adjust time_plot_width or time_plot_center.'
         )
-    if scient_scale_x:
-        x_formatter = EngFormatter()
-        ax.xaxis.set_major_formatter(x_formatter)
-    if scient_scale_y:
-        y_formatter = EngFormatter()
-        ax.yaxis.set_major_formatter(y_formatter)
+    ax = _scale_plot(
+        ax,
+        scient_scale_x,
+        scient_scale_y,
+    )
     xlims = [
         time_plot_center - time_plot_width,
         time_plot_center + time_plot_width,
