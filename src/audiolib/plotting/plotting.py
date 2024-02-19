@@ -15,14 +15,13 @@ def _parse_plot_func(
         yscale,
 ):
     if xscale == 'lin' and yscale == 'lin':
-        plot_func = ax.plot
+        return ax.plot
     if xscale == 'log' and yscale == 'lin':
-        plot_func = ax.semilogx
+        return ax.semilogx
     if xscale == 'lin' and yscale == 'log':
-        plot_func = ax.semilogy
+        return ax.semilogy
     if xscale == 'log' and yscale == 'log':
-        plot_func = ax.loglog
-    return plot_func
+        return ax.loglog
 
 def _axis_formatter(
         ax,
