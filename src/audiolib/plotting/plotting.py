@@ -3,24 +3,10 @@ import numpy as np
 import scipy.signal as scsp
 import scipy.io.wavfile as scio
 
-from matplotlib import ticker
+from matplotlib.ticker import EngFormatter
 from scipy.fftpack import fftshift
 
 # TODO: Try to write plotting as pyplot wrapper
-
-# Function to plot x- and y-axis with k for kilo and M for Mega
-# TODO: Fix MKFUNC for yscale around 0
-MKFUNC = (
-    lambda x, pos: '%1.1fM' % (x * 1e-6)
-    if x >= 1e6 else '%1.1fk'
-    % (x * 1e-3) if x >= 1e3 else '%1.1f'
-    % x
-    % (x * 1e3) if x >= 1e-3 else '%1.1fm'
-    % (x * 1e6) if x >= 1e-6 else '%1.1fµ'
-    % (x * 1e9) if x >= 1e-9 else '%1.1fn'
-    % (x * 1e12) if x >= 1e-12 else '%1.1fp'
-    % x
-) 
 
 def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
     if interactive_on:
@@ -42,20 +28,21 @@ def plot_rfft_freq(
         data,
         xscale='lin',
         yscale='lin',
-        scient_scale=True,
+        scient_scale_x=True,
+        scient_scale_y=False,
         fig=None,
         ax=None,
         interactive_on=False,
         **line_kwargs,
 ):
-    mkformatter = ticker.FuncFormatter(MKFUNC)
+    
     if interactive_on:
         plt.ion()
     if fig is None:
         fig = plt.figure()
     if ax is None:
         ax = plt.gca()
-        
+    x_formatter = EngFormatter(unit='Hz')
     if xscale == 'lin' and yscale == 'lin':
         ax.plot(f, data, **line_kwargs)
     if xscale == 'log' and yscale == 'lin':
@@ -64,9 +51,12 @@ def plot_rfft_freq(
         ax.semilogy(f, data, **line_kwargs)
     if xscale == 'log' and yscale == 'log':
         ax.loglog(f, data, **line_kwargs)
-    if scient_scale and (xscale == 'log'):
-        ax.xaxis.set_major_formatter(mkformatter)
-        # TODO: Insert yaxis scient scale as soon as fixed
+    if scient_scale_x:
+        x_formatter = EngFormatter()
+        ax.xaxis.set_major_formatter(x_formatter)
+    if scient_scale_y:
+        y_formatter = EngFormatter()
+        ax.yaxis.set_major_formatter(y_formatter)
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
@@ -74,30 +64,116 @@ def plot_rfft_freq(
     return fig, ax,
 
 def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
-    plt.figure()
+    fig = plt.figure()
     plt.subplot(311)
-    ax0 = plt.gca()
-    ax0.set_title('Transfer Function Mic2/Mic1')
-    ax0.plot(freq_h, magnitude)
-    ax0.grid(which='both')
-    ax0.set_ylabel('Magnitude [dB]')
-    plt.subplot(312, sharex=ax0)
-    ax1 = plt.gca()
-    ax1.plot(freq_h, phase_deg,)
-    ax1.set_ylabel('Phase [Deg]')
-    ax1.grid(which='both')
-    plt.subplot(313, sharex=ax0)
-    ax2 = plt.gca()
-    ax2.plot(freq_msc, msc,)
-    ax2.set_ylabel('MSC')
-    ax2.grid(which='both')
-    ax2.set_xlabel('Frequency [Hz]')
-    ax2.set_ylim([.5, 1.2])
-    _ = plt.setp(ax0.get_xticklabels(), visible=False)
-    _ = plt.setp(ax1.get_xticklabels(), visible=False)
+    ax_mod = plt.gca()
+    ax_mod.set_title('Transfer Function Mic2/Mic1')
+    ax_mod.plot(freq_h, magnitude)
+    ax_mod.grid(which='both')
+    ax_mod.set_ylabel('Magnitude [dB]')
+    plt.subplot(312, sharex=ax_mod)
+    ax_arg = plt.gca()
+    ax_arg.plot(freq_h, phase_deg,)
+    ax_arg.set_ylabel('Phase [Deg]')
+    ax_arg.grid(which='both')
+    plt.subplot(313, sharex=ax_mod)
+    ax_msc = plt.gca()
+    ax_msc.plot(freq_msc, msc,)
+    ax_msc.set_ylabel('MSC')
+    ax_msc.grid(which='both')
+    ax_msc.set_xlabel('Frequency [Hz]')
+    ax_msc.set_ylim([.5, 1.2])
+    _ = plt.setp(ax_mod.get_xticklabels(), visible=False)
+    _ = plt.setp(ax_arg.get_xticklabels(), visible=False)
+    
+    return fig, ax_mod, ax_arg, ax_msc,
+
+def plot_mag_phase():
+    print("To be implemented.")
     pass
 
-def plot_rfft_ir(t, ir, ):
-    # TODO: Implement
-    print('To be implemented.')
-    pass
+def plot_ir(
+        t,
+        ir,
+        time_plot_width = None,
+        time_plot_center = 0,
+        scient_scale_x=True,
+        scient_scale_y=False,
+        fig=None,
+        ax=None,
+        interactive_on=False,
+        **line_kwargs,
+):
+    """
+    Plot zero-centered impulse response.
+
+    Parameters
+    ----------
+    t : array
+        Time vector
+    ir : array
+        Impulse response to be plotted
+    time_plot_width : float
+        Time-Width of the plot. Defaults to None (whole IR plotted)
+    time_plot_center : float
+        Can only be set if time_plot_width is set.
+        Defaults to t = 0.
+    scient_scale : boolean
+        If True, x-axis is shown using engineering prefixes to represent powers of 1000,
+        plus a specified unit, e.g., 10 MHz instead of 1e7.
+    fig : matplotlib.figure.Figure
+        Figure instance of current IR fig
+    ax : matplotlib.axes._axes.Axes
+        Axes instance of current IR fig
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        Figure instance of current IR fig
+    ax : matplotlib.axes._axes.Axes
+        Axes instance of current IR fig
+    """
+
+    if interactive_on:
+        plt.ion()
+    if fig is None:
+        fig = plt.figure()
+    if ax is None:
+        ax = plt.gca()
+    if time_plot_width is None:
+        time_plot_width = t[-1] # Plot everything if None
+    if (time_plot_center - time_plot_width) < t[0]:
+        raise ValueError(
+            'Chosen plot end smaller than lowest available timestamp. ' +
+            'Adjust time_plot_width or time_plot_center.'
+        )
+    if (time_plot_center + time_plot_width) > t[-1]:
+        raise ValueError(
+            'Chosen plot end smaller larger than highest available timestamp. ' +
+            'Adjust time_plot_width or time_plot_center.'
+        )
+    if scient_scale_x:
+        x_formatter = EngFormatter()
+        ax.xaxis.set_major_formatter(x_formatter)
+    if scient_scale_y:
+        y_formatter = EngFormatter()
+        ax.yaxis.set_major_formatter(y_formatter)
+    xlims = [
+        time_plot_center - time_plot_width,
+        time_plot_center + time_plot_width,
+    ]
+
+    fig.set_size_inches([6.4, 3])
+    ax = plt.gca()
+    ax.set_title('Impulse Response')
+    ax.plot(
+        t,
+        ir,
+        '--o',
+        **line_kwargs,
+    )
+    ax.set_xlim(xlims)
+    ax.set_xlabel('Time [s]')
+    ax.grid()
+    plt.tight_layout()
+    return fig, ax,
