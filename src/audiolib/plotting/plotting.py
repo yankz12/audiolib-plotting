@@ -1,7 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np 
-import scipy.signal as scsp
-import scipy.io.wavfile as scio
 
 from matplotlib.ticker import EngFormatter
 from scipy.fftpack import fftshift
@@ -34,7 +31,16 @@ def _axis_formatter(
         ax.yaxis.set_major_formatter(ENG_FORMAT)
     return ax
 
-def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
+def plot_time(
+        t,
+        data,
+        scient_scale_x=False,
+        scient_scale_y=False,
+        fig=None,
+        ax=None,
+        interactive_on=False,
+        **line_kwargs,
+    ):
     if interactive_on:
         plt.ion()
     if fig is None:
@@ -42,6 +48,7 @@ def plot_time(t, data, fig=None, ax=None, interactive_on=False, **line_kwargs):
     if ax is None:
         ax = plt.gca()
     ax.plot(t, data, **line_kwargs)
+    ax = _axis_formatter(ax, scient_scale_x, scient_scale_y, )
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
