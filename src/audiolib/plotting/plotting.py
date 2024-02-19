@@ -24,7 +24,7 @@ def _parse_plot_func(
         plot_func = ax.loglog
     return plot_func
 
-def _scale_plot(
+def _axis_formatter(
         ax,
         scient_scale_x,
         scient_scale_y,
@@ -75,7 +75,7 @@ def plot_rfft_freq(
         yscale,
     )
     plot_func(f, data, **line_kwargs)
-    ax = _scale_plot(ax, scient_scale_x, scient_scale_y, )
+    ax = _axis_formatter(ax, scient_scale_x, scient_scale_y, )
     ax.set_xlabel('Frequency [Hz]')
     ax.set_ylabel('Amplitude')  
     ax.grid(True, which='both')
@@ -145,6 +145,7 @@ def plot_ir(
         Figure instance of current IR fig
     ax : matplotlib.axes._axes.Axes
         Axes instance of current IR fig
+    *args
 
     Returns
     -------
@@ -152,6 +153,24 @@ def plot_ir(
         Figure instance of current IR fig
     ax : matplotlib.axes._axes.Axes
         Axes instance of current IR fig
+
+    Other Parameters
+    ----------------
+    **line_kwargs : `~matplotlib.lines.Line2D` properties, optional
+        *kwargs* are used to specify properties like a line label (for
+        auto legends), linewidth, antialiasing, marker face color.
+        Example::
+
+        >>> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
+        >>> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
+
+        If you specify multiple lines with one plot call, the kwargs apply
+        to all those lines. In case the label object is iterable, each
+        element is used as labels for each set of data.
+
+        Here is a list of available `.Line2D` properties:
+
+        %(Line2D:kwdoc)s
     """
 
     if interactive_on:
@@ -172,7 +191,7 @@ def plot_ir(
             'Chosen plot end smaller larger than highest available timestamp. ' +
             'Adjust time_plot_width or time_plot_center.'
         )
-    ax = _scale_plot(
+    ax = _axis_formatter(
         ax,
         scient_scale_x,
         scient_scale_y,
