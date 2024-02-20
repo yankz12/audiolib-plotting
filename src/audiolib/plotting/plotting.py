@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from matplotlib.ticker import EngFormatter
 from scipy.fftpack import fftshift
@@ -221,3 +222,14 @@ def plot_ir(
     ax.grid()
     plt.tight_layout()
     return fig, ax,
+
+def unit_circle(radius=1, theta_res=1000, fig=None, ax=None, ):
+    # TODO: Test
+    if (fig is None) and (ax is None):
+        fig = plt.figure()
+        ax = plt.gca()    
+    theta = np.arange(0, 2*np.pi, 2*np.pi/theta_res)
+    unit_circle = radius*np.exp(1j*theta)
+    ax.plot(np.real(unit_circle), np.imag(unit_circle))
+    return fig, ax, 
+
