@@ -5,6 +5,8 @@ from matplotlib.ticker import EngFormatter
 from scipy.fftpack import fftshift
 
 # TODO: Try to write plotting as pyplot wrapper
+# TODO: Rewrite with OOP
+
 ENG_FORMAT = EngFormatter()
 
 def _parse_plot_func(
@@ -94,7 +96,6 @@ def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
     fig = plt.figure()
     plt.subplot(311)
     ax_mod = plt.gca()
-    ax_mod.set_title('Transfer Function Mic2/Mic1')
     ax_mod.plot(freq_h, magnitude)
     ax_mod.grid(which='both')
     ax_mod.set_ylabel('Magnitude [dB]')
@@ -115,9 +116,112 @@ def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
 
     return fig, ax_mod, ax_arg, ax_msc,
 
-def plot_mag_phase():
-    print("To be implemented.")
-    pass
+def plot_mag_phase(
+        freq_h,
+        magnitude,
+        phase_deg,
+        xscale='lin',
+        yscale_mag='lin',
+        scient_scale_x=True,
+        scient_scale_y=False,
+        fig=None,
+        ax_mag=None,
+        ax_arg=None,
+        interactive_on=False,
+        **line_kwargs,
+):
+    """
+    Plot Magnitude and phase in 211/212 subplots. Subplots share xaxis.
+
+    Parameters
+    ----------
+    freq : array
+        Frequency vector
+    magnitude : array
+        Magnitude vector
+    phase_deg : float
+        Phase in Degree
+    xscale : str
+        Options: 'lin', 'log', Defines wether the shared xaxis will be plotted linearly
+        or logarithmically. Defaults to 'lin'
+    yscale_mag : boolean
+        Options: 'lin', 'log', Defines wether the yaxis of magnitude will be plotted 
+        linearly or logarithmically. Phase y-axis is always linear. Defaults to 'lin'.
+    scient_scale_x : boolean
+        If True, x-axis is shown using engineering prefixes to represent powers of 1000,
+        e.g., 10 k instead of 10e3. Defaults to True.
+    scient_scale_y : boolean
+        If True, y-axis is shown using engineering prefixes to represent powers of 1000,
+        e.g., 10 k instead of 10e3. Defaults to False.
+    interactive_on : boolean
+        Sets pyplot.ion() to this value to allow pyplot interactivity. Defaults to False.
+    fig : matplotlib.figure.Figure
+        Figure instance of figure to be plotted in. Has to be subplot of 211/212
+    ax : matplotlib.axes._axes.Axes
+        Axes instance of axis to be plotted in. Has to be subplot of 211/212
+    *args
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        Figure instance of current IR fig
+    ax : matplotlib.axes._axes.Axes
+        Axes instance of current IR fig
+
+    Other Parameters
+    ----------------
+    **line_kwargs : `~matplotlib.lines.Line2D` properties, optional
+        *kwargs* are used to specify properties like a line label (for
+        auto legends), linewidth, antialiasing, marker face color.
+        Example::
+
+        >>> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
+        >>> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
+
+        If you specify multiple lines with one plot call, the kwargs apply
+        to all those lines. In case the label object is iterable, each
+        element is used as labels for each set of data.
+
+        Here is a list of available `.Line2D` properties:
+
+        %(Line2D:kwdoc)s
+    """
+    if interactive_on:
+        plt.ion()
+    if fig is None:
+        fig = plt.figure()
+
+    plt.subplot(211)
+    if ax_mag is None:
+        ax_mag = plt.gca()
+    plot_func_mag = _parse_plot_func(
+        ax_mag,
+        xscale,
+        yscale_mag,
+    )
+    plot_func_mag(freq_h, magnitude, **line_kwargs)
+    ax_mag.grid(which='both')
+    ax_mag.set_ylabel('Magnitude')
+
+    plt.subplot(212, sharex=ax_mag)
+    if ax_arg is None:
+        ax_arg = plt.gca()
+    plot_func_arg = _parse_plot_func(
+        ax_arg,
+        xscale,
+        'lin',
+    )
+    plot_func_arg(freq_h, phase_deg, )
+    ax_arg.set_ylabel('Phase [Deg]')
+    ax_arg.set_xlabel('Frequency [Hz]')
+
+    ax_mag = _axis_formatter(ax_mag, scient_scale_x, scient_scale_y, )
+    if 'label' in line_kwargs:
+        ax_mag.legend()
+    plt.tight_layout()
+    # ax_arg.grid(which='both')
+    ax_mag.grid(which='both')
+    return fig, ax_mag, ax_arg,
 
 def plot_ir(
         t,
@@ -145,9 +249,14 @@ def plot_ir(
     time_plot_center : float
         Can only be set if time_plot_width is set.
         Defaults to t = 0.
-    scient_scale : boolean
+    scient_scale_x : boolean
         If True, x-axis is shown using engineering prefixes to represent powers of 1000,
-        plus a specified unit, e.g., 10 MHz instead of 1e7.
+        plus a specified unit, e.g., 10 MHz instead of 1e7. Defaults to True.
+    scient_scale_y : boolean
+        If True, y-axis is shown using engineering prefixes to represent powers of 1000,
+        e.g., 10 MHz instead of 1e7. Defaults to False.
+    interactive_on : boolean
+        Sets pyplot.ion() to this value to allow interactivity. Defaults to False.
     fig : matplotlib.figure.Figure
         Figure instance of current IR fig
     ax : matplotlib.axes._axes.Axes
