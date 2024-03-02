@@ -7,7 +7,7 @@ from scipy.fftpack import fftshift
 # TODO: Try to write plotting as pyplot wrapper
 # TODO: Rewrite with OOP
 
-ENG_FORMAT = EngFormatter()
+_ENG_FORMAT = EngFormatter()
 
 def _parse_plot_func(
         ax,
@@ -29,9 +29,9 @@ def _axis_formatter(
         scient_scale_y,
 ):
     if scient_scale_x:
-        ax.xaxis.set_major_formatter(ENG_FORMAT)
+        ax.xaxis.set_major_formatter(_ENG_FORMAT)
     if scient_scale_y:
-        ax.yaxis.set_major_formatter(ENG_FORMAT)
+        ax.yaxis.set_major_formatter(_ENG_FORMAT)
     return ax
 
 def plot_time(
