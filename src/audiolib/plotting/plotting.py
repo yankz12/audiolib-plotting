@@ -165,8 +165,10 @@ def plot_mag_phase(
     -------
     fig : matplotlib.figure.Figure
         Figure instance of current IR fig
-    ax : matplotlib.axes._axes.Axes
-        Axes instance of current IR fig
+    ax_mag : matplotlib.axes._axes.Axes
+        Axes instance of magnitude axis
+    ax_arg : matplotlib.axes._axes.Axes
+        Axes instance of phase axis
 
     Other Parameters
     ----------------
