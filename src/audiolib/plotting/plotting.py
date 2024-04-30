@@ -225,6 +225,27 @@ def plot_mag_phase(
     ax_mag.grid(which='both')
     return fig, ax_mag, ax_arg,
 
+def plot_2d_pressure(
+    x_coords,
+    y_coords,
+    vals,
+    fig=None,
+    ax=None,
+    interactive_on=False,
+    **pcolor_kwargs
+):
+    if interactive_on:
+        plt.ion()
+    fig = plt.figure()
+    mesh_color = plt.pcolormesh(x_coords, y_coords, vals, **pcolor_kwargs)
+    ax = plt.gca()
+    cbar = fig.colorbar(mappable=mesh_color, ax=ax)
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
+    cbar.ax.set_ylabel('Pressure Level [dB SPL]')
+    plt.tight_layout()
+    return fig, ax, 
+
 def plot_ir(
         t,
         ir,

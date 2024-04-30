@@ -4,6 +4,7 @@ from .plotting import (
     plot_h_full,
     plot_ir,
     plot_mag_phase,
+    plot_2d_pressure,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     'plot_h_full',
     'plot_ir',
     'plot_mag_phase',
+    'plot_2d_pressure',
 ]
