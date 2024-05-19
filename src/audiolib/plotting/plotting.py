@@ -244,7 +244,7 @@ def plot_2d_pressure(
     ax.set_ylabel('y [m]')
     cbar.ax.set_ylabel('Pressure Level [dB SPL]')
     plt.tight_layout()
-    return fig, ax, 
+    return fig, ax, cbar
 
 def plot_ir(
         t,
