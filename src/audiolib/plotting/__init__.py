@@ -5,6 +5,7 @@ from .plotting import (
     plot_ir,
     plot_mag_phase,
     plot_2d_pressure,
+    BlittedCursor,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     'plot_ir',
     'plot_mag_phase',
     'plot_2d_pressure',
+    'BlittedCursor',
 ]
