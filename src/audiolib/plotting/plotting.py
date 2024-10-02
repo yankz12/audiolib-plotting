@@ -268,7 +268,6 @@ def plot_mag_phase(
         yscale_mag,
     )
     plot_func_mag(freq_h, magnitude, **line_kwargs)
-    ax_mag.grid(which='both')
     ax_mag.set_ylabel('Magnitude')
 
     plt.subplot(212, sharex=ax_mag)
@@ -279,16 +278,18 @@ def plot_mag_phase(
         xscale,
         'lin',
     )
-    plot_func_arg(freq_h, phase_deg, )
+    plot_func_arg(freq_h, phase_deg, **line_kwargs)
     ax_arg.set_ylabel('Phase [Deg]')
     ax_arg.set_xlabel('Frequency [Hz]')
 
     ax_mag = _axis_formatter(ax_mag, scient_scale_x, scient_scale_y, )
     if 'label' in line_kwargs:
         ax_mag.legend()
-    plt.tight_layout()
-    # ax_arg.grid(which='both')
-    ax_mag.grid(which='both')
+    # ax_arg.grid(which='both', axis='both', )
+    ax_mag.grid(visible = True, which='both', axis='both', )
+    ax_arg.grid(visible = True, which='both', axis='both', )
+    # plt.grid()
+    # plt.tight_layout()
     return fig, ax_mag, ax_arg,
 
 def plot_2d_pressure(
