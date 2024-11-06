@@ -422,13 +422,13 @@ def plot_ir(
     plt.tight_layout()
     return fig, ax,
 
-def unit_circle(radius=1, theta_res=1000, fig=None, ax=None, ):
+def unit_circle(radius=1, theta_res=1000, fig=None, ax=None, **line_kwargs, ):
     # TODO: Test
     if (fig is None) and (ax is None):
         fig = plt.figure()
         ax = plt.gca()    
     theta = np.arange(0, 2*np.pi, 2*np.pi/theta_res)
     unit_circle = radius*np.exp(1j*theta)
-    ax.plot(np.real(unit_circle), np.imag(unit_circle))
+    ax.plot(np.real(unit_circle), np.imag(unit_circle), **line_kwargs)
     return fig, ax, 
 
