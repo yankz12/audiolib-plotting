@@ -158,21 +158,21 @@ def plot_rfft_freq(
         ax.legend()
     return fig, ax,
 
-def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
+def plot_h_full(f, f_msc, magnitude, phase_deg, msc,):
     fig = plt.figure()
     plt.subplot(311)
     ax_mod = plt.gca()
-    ax_mod.plot(freq_h, magnitude)
+    ax_mod.plot(f, magnitude)
     ax_mod.grid(which='both')
     ax_mod.set_ylabel('Magnitude [dB]')
     plt.subplot(312, sharex=ax_mod)
     ax_arg = plt.gca()
-    ax_arg.plot(freq_h, phase_deg,)
+    ax_arg.plot(f, phase_deg,)
     ax_arg.set_ylabel('Phase [Deg]')
     ax_arg.grid(which='both')
     plt.subplot(313, sharex=ax_mod)
     ax_msc = plt.gca()
-    ax_msc.plot(freq_msc, msc,)
+    ax_msc.plot(f_msc, msc,)
     ax_msc.set_ylabel('MSC')
     ax_msc.grid(which='both')
     ax_msc.set_xlabel('Frequency [Hz]')
@@ -183,7 +183,7 @@ def plot_h_full(freq_h, freq_msc, magnitude, phase_deg, msc,):
     return fig, ax_mod, ax_arg, ax_msc,
 
 def plot_mag_phase(
-        freq_h,
+        f,
         magnitude,
         phase_deg,
         xscale='lin',
@@ -267,7 +267,7 @@ def plot_mag_phase(
         xscale,
         yscale_mag,
     )
-    plot_func_mag(freq_h, magnitude, **line_kwargs)
+    plot_func_mag(f, magnitude, **line_kwargs)
     ax_mag.set_ylabel('Magnitude')
 
     plt.subplot(212, sharex=ax_mag)
@@ -278,18 +278,16 @@ def plot_mag_phase(
         xscale,
         'lin',
     )
-    plot_func_arg(freq_h, phase_deg, **line_kwargs)
+    plot_func_arg(f, phase_deg, **line_kwargs)
     ax_arg.set_ylabel('Phase [Deg]')
     ax_arg.set_xlabel('Frequency [Hz]')
 
     ax_mag = _axis_formatter(ax_mag, scient_scale_x, scient_scale_y, )
     if 'label' in line_kwargs:
         ax_mag.legend()
-    # ax_arg.grid(which='both', axis='both', )
     ax_mag.grid(visible = True, which='both', axis='both', )
     ax_arg.grid(visible = True, which='both', axis='both', )
-    # plt.grid()
-    # plt.tight_layout()
+
     return fig, ax_mag, ax_arg,
 
 def plot_2d_pressure(
@@ -341,10 +339,10 @@ def plot_ir(
         Defaults to t = 0.
     scient_scale_x : boolean
         If True, x-axis is shown using engineering prefixes to represent powers of 1000,
-        plus a specified unit, e.g., 10 MHz instead of 1e7. Defaults to True.
+        plus a specified unit, e.g., 10 MHz instead of 1e7 Hz. Defaults to True.
     scient_scale_y : boolean
         If True, y-axis is shown using engineering prefixes to represent powers of 1000,
-        e.g., 10 MHz instead of 1e7. Defaults to False.
+        e.g., 10 MHz instead of 1e7 Hz. Defaults to False.
     interactive_on : boolean
         Sets pyplot.ion() to this value to allow interactivity. Defaults to False.
     fig : matplotlib.figure.Figure
