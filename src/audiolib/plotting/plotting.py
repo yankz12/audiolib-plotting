@@ -186,6 +186,7 @@ def plot_mag_phase(
         f,
         magnitude,
         phase_deg,
+        phase_xlim_idcs=None,
         xscale='lin',
         yscale_mag='lin',
         scient_scale_x=True,
@@ -201,12 +202,25 @@ def plot_mag_phase(
 
     Parameters
     ----------
-    freq : array
+    f : array
         Frequency vector
     magnitude : array
         Magnitude vector
     phase_deg : float
         Phase in Degree
+    phase_xlim_idcs : np.array, optional, defaults to None
+        Array of frequency limits to show for phase. The form is:
+        [
+            [lower_lim_1st, upper_lim_1st,],
+            [lower_lim_2nd, upper_lim_2nd,],
+            [lower_lim_3rd, upper_lim_3rd,],
+            ...
+        ]
+        with 1st, 2nd, ... being the 1st, 2nd, ... harmonic FRF.
+        If one of the two entries for a harmonic is None, no limits will
+        be applied at all to this HHFRF.
+        Reason: Phase sometimes does not give valuable information outside
+        frequency range under study, would only distort the visuals.
     xscale : str
         Options: 'lin', 'log', Defines wether the shared xaxis will be plotted linearly
         or logarithmically. Defaults to 'lin'
@@ -258,6 +272,12 @@ def plot_mag_phase(
         plt.ion()
     if fig is None:
         fig = plt.figure()
+    if len(phase_xlim_idcs) != len(phase_deg.transpose()):
+        raise ValueError(
+            f'XLim phase indices array has to be of same len as phase_deg ' +
+            f'but is of len {len(phase_xlim_idcs)} instead '
+            f'of {len(phase_deg.transpose())}.'
+        )
 
     plt.subplot(211)
     if ax_mag is None:
@@ -278,7 +298,14 @@ def plot_mag_phase(
         xscale,
         'lin',
     )
-    plot_func_arg(f, phase_deg, **line_kwargs)
+    for idx, lims in enumerate(phase_xlim_idcs):
+        no_lims = (lims[0] is None) or (lims[1] is None)
+        plot_func_arg(
+            f if no_lims else f[lims[0]:lims[1]],
+            phase_deg[:, idx] if no_lims else phase_deg[lims[0]:lims[1], idx],
+            **line_kwargs,
+        ) # TODO: Implement that just one None will be properly interpreted
+    
     ax_arg.set_ylabel('Phase [Deg]')
     ax_arg.set_xlabel('Frequency [Hz]')
 
