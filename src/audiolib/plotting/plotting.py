@@ -272,13 +272,9 @@ def plot_mag_phase(
         plt.ion()
     if fig is None:
         fig = plt.figure()
-    if len(phase_xlim_idcs) != len(phase_deg.transpose()):
-        raise ValueError(
-            f'XLim phase indices array has to be of same len as phase_deg ' +
-            f'but is of len {len(phase_xlim_idcs)} instead '
-            f'of {len(phase_deg.transpose())}.'
-        )
 
+    # ------------------------------------------------------------------------
+    # Magnitude plot
     plt.subplot(211)
     if ax_mag is None:
         ax_mag = plt.gca()
@@ -290,6 +286,8 @@ def plot_mag_phase(
     plot_func_mag(f, magnitude, **line_kwargs)
     ax_mag.set_ylabel('Magnitude')
 
+    # ------------------------------------------------------------------------
+    # Phase subplot
     plt.subplot(212, sharex=ax_mag)
     if ax_arg is None:
         ax_arg = plt.gca()
@@ -298,17 +296,22 @@ def plot_mag_phase(
         xscale,
         'lin',
     )
-    for idx, lims in enumerate(phase_xlim_idcs):
-        no_lims = (lims[0] is None) or (lims[1] is None)
-        plot_func_arg(
-            f if no_lims else f[lims[0]:lims[1]],
-            phase_deg[:, idx] if no_lims else phase_deg[lims[0]:lims[1], idx],
-            **line_kwargs,
-        ) # TODO: Implement that just one None will be properly interpreted
-    
+    if phase_xlim_idcs is not None:
+        for idx, lims in enumerate(phase_xlim_idcs):
+            no_lims = (lims[0] is None) or (lims[1] is None)
+            plot_func_arg(
+                f if no_lims else f[lims[0]:lims[1]],
+                phase_deg[:, idx] if no_lims else phase_deg[lims[0]:lims[1], idx],
+                **line_kwargs,
+            ) # TODO: Implement that just one None will be properly interpreted
+    else:
+        plot_func_arg(f, phase_deg, **line_kwargs, )
+
     ax_arg.set_ylabel('Phase [Deg]')
     ax_arg.set_xlabel('Frequency [Hz]')
 
+    # ------------------------------------------------------------------------
+    # Grid, legend and axis
     ax_mag = _axis_formatter(ax_mag, scient_scale_x, scient_scale_y, )
     if 'label' in line_kwargs:
         ax_mag.legend()
